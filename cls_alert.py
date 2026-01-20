@@ -18,7 +18,7 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8248558481:AAEGZAnoi8
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "984635456")
 CHECK_INTERVAL = 60  # seconds between checks
 CLS_URL = "https://www.cls.cn/telegraph"
-KEYWORDS = ["上市申请"]  # Only send messages containing these keywords
+KEYWORDS = ["财联社"]  # Only send messages containing these keywords
 # =======================================
 
 STATE_FILE = os.path.join(os.path.dirname(__file__), ".seen_ids.json")
