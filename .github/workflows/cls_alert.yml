@@ -1,0 +1,47 @@
+name: CLS Telegraph Alert
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright requests
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Restore seen IDs cache
+        uses: actions/cache@v4
+        with:
+          path: .seen_ids.json
+          key: seen-ids-${{ github.run_id }}
+          restore-keys: |
+            seen-ids-
+
+      - name: Run alert check
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python cls_alert.py --once
+
+      - name: Save seen IDs to cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .seen_ids.json
+          key: seen-ids-${{ github.run_id }}
