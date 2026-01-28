@@ -76,7 +76,16 @@ def fetch_telegraph():
         try:
             log("Fetching CLS Telegraph...")
             page.goto(CLS_URL, timeout=60000)
-            page.wait_for_timeout(6000)
+            page.wait_for_timeout(3000)
+            
+            # Scroll down to load more items
+            for _ in range(3):
+                page.evaluate("window.scrollBy(0, 1000)")
+                page.wait_for_timeout(1000)
+            
+            # Scroll back to top
+            page.evaluate("window.scrollTo(0, 0)")
+            page.wait_for_timeout(1000)
             
             # Try multiple selectors to find telegraph items
             # Look for elements that contain the telegraph news
@@ -99,7 +108,7 @@ def fetch_telegraph():
                     continue
             
             if found_elements:
-                for elem in found_elements[:30]:
+                for elem in found_elements[:50]:
                     try:
                         text = elem.text_content().strip()
                         # Look for time pattern and title in brackets
