@@ -5,6 +5,15 @@ on:
     # Run every 5 minutes
     - cron: '*/5 * * * *'
   workflow_dispatch:  # Allow manual trigger
+    inputs:
+      mode:
+        description: 'What should the manual run do?'
+        required: true
+        default: 'check'
+        type: choice
+        options:
+          - check
+          - test-message
 
 jobs:
   check-news:
@@ -34,10 +43,18 @@ jobs:
             seen-ids-
 
       - name: Run alert check
+        if: github.event_name != 'workflow_dispatch' || inputs.mode == 'check'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python cls_alert.py --once
+
+      - name: Send Telegram test message
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'test-message'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python cls_alert.py --send-test-message
 
       - name: Save seen IDs to cache
         uses: actions/cache/save@v4
