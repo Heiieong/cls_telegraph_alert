@@ -9,22 +9,34 @@ Auto-send latest news from [财联社电报](https://www.cls.cn/telegraph) to Te
 pip install -r requirements.txt
 playwright install chromium
 
-# Run
-python cls_alert.py
+# Safe test run: fetch once, print matching Telegram messages, do not send
+python cls_alert.py --dry-run
+
+# Run one production check, send matched new items, update seen state
+TELEGRAM_BOT_TOKEN=xxx TELEGRAM_CHAT_ID=xxx python cls_alert.py --once
+
+# Continuous local monitor
+TELEGRAM_BOT_TOKEN=xxx TELEGRAM_CHAT_ID=xxx python cls_alert.py
 ```
 
-That's it! The script will:
-1. Send a test message to verify connection
-2. Start monitoring for new telegraph items
-3. Auto-send new items to your Telegram
+The script sends 财联社电报 items only when the title or content contains one of:
+
+```text
+上市申请, 联席保荐人, 发行H股, 独家保荐人
+```
 
 ## Configuration
 
-Edit `cls_alert.py` to change:
+Use environment variables:
 
-```python
-CHECK_INTERVAL = 60  # Check every 60 seconds
+```bash
+export TELEGRAM_BOT_TOKEN="your-bot-token"
+export TELEGRAM_CHAT_ID="your-chat-id"
+export CHECK_INTERVAL=60
+export KEYWORDS="上市申请,联席保荐人,发行H股,独家保荐人"
 ```
+
+Use `python cls_alert.py --send-test-message` to verify Telegram credentials.
 
 ## Run in Background
 
